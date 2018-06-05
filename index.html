@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title></title>
+
+  <style media="screen">
+    
+  </style>
+
+</head>
+<body>
+
+    <!-- Include Quill stylesheet -->
+    <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
+
+    <!-- Create the toolbar container -->
+    <div id="toolbar">
+      <button class="ql-bold">Bold</button>
+      <button class="ql-italic">Italic</button>
+    </div>
+
+    <!-- Create the editor container -->
+    <div id="editor">
+      <p>Hello World!</p>
+    </div>
+
+    <!-- Include the Quill library -->
+    <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+
+    <!-- Firebase App is always required and must be first -->
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-app.js"></script>
+
+    <!-- Add additional services you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase-functions.js"></script>
+
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyCwZoqovS7LZKWE5TZ4R6ewuBvLPhQrplQ",
+        authDomain: "justnote-6c43c.firebaseapp.com",
+        databaseURL: "https://justnote-6c43c.firebaseio.com",
+        projectId: "justnote-6c43c",
+        storageBucket: "justnote-6c43c.appspot.com",
+        messagingSenderId: "1083471929184"
+      };
+      firebase.initializeApp(config);
+    </script>
+
+    <script type="text/javascript">
+        const dbRef = firebase.database().ref();
+        const noteRef = dbRef.child('notes/0');
+
+        var editor = new Quill('#editor', {
+            modules: { toolbar: '#toolbar' },
+            theme: 'snow'
+        });
+
+        noteRef.once("value", function(snapshot) {
+            editor.setText(snapshot.val().value);
+        }, function (errorObject) {
+            console.log("The read failed: " + errorObject.code);
+        });
+
+        editor.on('text-change', function(delta, oldDelta, source) {
+            if (source == 'api') {
+                console.log("An API call triggered this change.");
+            } else if (source == 'user') {
+                console.log("A user action triggered this change.");
+                var text = editor.getText();
+                noteRef.set({
+                    value: text
+                });
+            }
+        });
+    </script>
+
+
+</body>
+</html>
